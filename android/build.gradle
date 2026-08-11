@@ -1,18 +1,8 @@
 group 'com.mapbox.maps.mapbox_maps'
 version '1.0.0'
 
-buildscript {
-    ext.kotlin_version = '1.8.22'
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.10.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
+// 1. BLOK BUILDSCRIPT DIHAPUS SEPENUHNYA
+// Kita biarkan Flutter (Built-in Kotlin) yang menyediakan plugin Kotlin secara otomatis.
 
 rootProject.allprojects {
     repositories {
@@ -36,20 +26,18 @@ rootProject.allprojects {
 
 apply plugin: 'com.android.library'
 
-// Kotlin is built into AGP 9+. For older AGP (Flutter < 3.44) the
-// 'kotlin-android' plugin must still be applied explicitly.
-def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
-if (agpMajor < 9) {
-    apply plugin: 'kotlin-android'
-}
+// 2. "apply plugin: 'kotlin-android'" DIHAPUS SEPENUHNYA
+// Flutter akan otomatis menyuntikkannya sehingga warning tidak akan muncul lagi.
 
 android {
     compileSdk flutter.compileSdkVersion
 
     namespace 'com.mapbox.maps.mapbox_maps'
+    
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
+    
     defaultConfig {
         minSdkVersion 21
     }
@@ -60,12 +48,15 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8
+// 3. KONFIGURASI KOTLIN YANG DIREKOMENDASIKAN FLUTTER
+// Ini adalah format paling aman untuk "Built-in Kotlin" agar file .kt tetap berhasil di-compile (bebas dari error 'cannot find symbol')
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
 }
 
+// Opsional: Bawaan mapbox untuk linting
 if (file("$rootDir/gradle/ktlint.gradle").exists() && file("$rootDir/gradle/lint.gradle").exists()) {
     project.apply {
         from("$rootDir/gradle/ktlint.gradle")
@@ -74,7 +65,7 @@ if (file("$rootDir/gradle/ktlint.gradle").exists() && file("$rootDir/gradle/lint
 }
 
 dependencies {
-    implementation "com.mapbox.maps:android-ndk27:11.30.0-SNAPSHOT-08-11--02-01.git-7d519e8"
+    implementation "com.mapbox.maps:android-ndk27:11.28.0"
 
     implementation "androidx.annotation:annotation:1.5.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.2"
