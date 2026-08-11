@@ -1,8 +1,18 @@
 group 'com.mapbox.maps.mapbox_maps'
 version '1.0.0'
 
-// 1. BLOK BUILDSCRIPT DIHAPUS SEPENUHNYA
-// Kita biarkan Flutter (Built-in Kotlin) yang menyediakan plugin Kotlin secara otomatis.
+// 1. KITA WAJIB PAKAI INI AGAR VERSI KOTLIN TIDAK DOWNGRADE
+buildscript {
+    ext.kotlin_version = '1.9.22'
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
 
 rootProject.allprojects {
     repositories {
@@ -25,9 +35,8 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-
-// 2. "apply plugin: 'kotlin-android'" DIHAPUS SEPENUHNYA
-// Flutter akan otomatis menyuntikkannya sehingga warning tidak akan muncul lagi.
+// 2. KITA WAJIB PAKAI INI AGAR COMPILER BERJALAN
+apply plugin: 'kotlin-android'
 
 android {
     compileSdk flutter.compileSdkVersion
@@ -48,19 +57,9 @@ android {
     }
 }
 
-// 3. KONFIGURASI KOTLIN YANG DIREKOMENDASIKAN FLUTTER
-// Ini adalah format paling aman untuk "Built-in Kotlin" agar file .kt tetap berhasil di-compile (bebas dari error 'cannot find symbol')
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         jvmTarget = "1.8"
-    }
-}
-
-// Opsional: Bawaan mapbox untuk linting
-if (file("$rootDir/gradle/ktlint.gradle").exists() && file("$rootDir/gradle/lint.gradle").exists()) {
-    project.apply {
-        from("$rootDir/gradle/ktlint.gradle")
-        from("$rootDir/gradle/lint.gradle")
     }
 }
 
